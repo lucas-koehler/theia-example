@@ -1,5 +1,5 @@
 {
-  "private": true,
+  "private": false,
   "name": "theia-example",
   "description": "Theia Development Environment",
   "productName": "Theia",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eclipse-theia/theia-example.git"
+    "url": "https://github.com/jfaltermeier/theia-example.git"
   },
   "engines": {
     "node": ">=10.2.0"
@@ -87,6 +87,7 @@
     "start:debug": "yarn start --log-level=debug",
     "test": "electron-mocha --timeout 60000 \"./lib/test/**/*.espec.js\"",
     "package": "electron-builder -c.mac.identity=null --publish never",
+    "deploy": "electron-builder -c.mac.identity=null --publish always",
     "package:preview": "electron-builder --dir",
     "download:plugins": "theia download:plugins"
   },

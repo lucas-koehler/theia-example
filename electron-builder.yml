@@ -1,4 +1,4 @@
-appId: eclipse.theia
+appId: eclipse.theia.java
 productName: Theia
 copyright: Copyright © 2020 Eclipse Foundation, Inc
 electronDist: node_modules/electron/dist
@@ -53,3 +53,7 @@ deb:
   artifactName: ${productName}-${version}.${ext}
 
 afterPack: ./scripts/after-pack.js
+
+publish:
+  provider: github
+  
