@@ -4,7 +4,7 @@
   "description": "Theia Development Environment",
   "productName": "Theia",
   "version": "1.6.0",
-  "main": "src-gen/frontend/electron-main.js",
+  "main": "scripts/theia-electron-main.js",
   "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
   "author": "Rob Moran <github@thegecko.org>",
   "homepage": "https://github.com/eclipse-theia/theia-example#readme",
@@ -77,16 +77,25 @@
     "rimraf": "^2.7.1"
   },
   "scripts": {
-    "prepare": "yarn build",
+    "prepare": "yarn build && yarn download:plugins",
     "lint": "theiaext lint",
     "clean": "theia clean && rimraf node_modules",
     "build": "theia rebuild:electron && yarn bundle",
     "bundle": "theia build",
     "watch": "concurrently -n compile,bundle \"theiaext watch --preserveWatchOutput\" \"theia build --watch --mode development\"",
-    "start": "theia start --plugins=local-dir:../../plugins",
+    "start": "electron scripts/theia-electron-main.js",
     "start:debug": "yarn start --log-level=debug",
     "test": "electron-mocha --timeout 60000 \"./lib/test/**/*.espec.js\"",
     "package": "electron-builder -c.mac.identity=null --publish never",
-    "package:preview": "electron-builder --dir"
+    "package:preview": "electron-builder --dir",
+    "download:plugins": "theia download:plugins"
+  },
+  "theiaPluginsDir": "plugins",
+  "theiaPlugins": {
+    "redhat.java": "https://open-vsx.org/api/redhat/java/0.69.0/file/redhat.java-0.69.0.vsix",
+    "vscjava.vscode-java-debug": "https://open-vsx.org/api/vscjava/vscode-java-debug/0.28.0/file/vscjava.vscode-java-debug-0.28.0.vsix",
+    "vscjava.vscode-java-test": "https://open-vsx.org/api/vscjava/vscode-java-test/0.24.2/file/vscjava.vscode-java-test-0.24.2.vsix",
+    "vscjava.vscode-maven": "https://open-vsx.org/api/vscjava/vscode-maven/0.21.2/file/vscjava.vscode-maven-0.21.2.vsix",
+    "vscjava.vscode-java-dependency": "https://open-vsx.org/api/vscjava/vscode-java-dependency/0.13.0/file/vscjava.vscode-java-dependency-0.13.0.vsix"
   }
 }

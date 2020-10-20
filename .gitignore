@@ -6,3 +6,4 @@ lib
 src-gen
 webpack.config.js
 gen-webpack.config.js
+plugins
