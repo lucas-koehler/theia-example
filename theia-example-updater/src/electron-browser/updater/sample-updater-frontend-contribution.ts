@@ -14,23 +14,24 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { remote, Menu, BrowserWindow } from 'electron';
-import { inject, injectable, postConstruct } from 'inversify';
-import { isOSX } from '@theia/core/lib/common/os';
-import { CommonMenus } from '@theia/core/lib/browser';
+import { BrowserWindow, Menu, remote } from 'electron';
 import {
-    Emitter,
     Command,
-    MenuPath,
-    MessageService,
-    MenuModelRegistry,
-    MenuContribution,
+    CommandContribution,
     CommandRegistry,
-    CommandContribution
+    Emitter,
+    MenuContribution,
+    MenuModelRegistry,
+    MenuPath,
+    MessageService
 } from '@theia/core/lib/common';
+import { SampleUpdater, SampleUpdaterClient, UpdateStatus } from '../../common/updater/sample-updater';
+import { inject, injectable, postConstruct } from 'inversify';
+
+import { CommonMenus } from '@theia/core/lib/browser';
 import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
-import { SampleUpdater, UpdateStatus, SampleUpdaterClient } from '../../common/updater/sample-updater';
+import { isOSX } from '@theia/core/lib/common/os';
 
 export namespace SampleUpdaterCommands {
 
@@ -45,19 +46,6 @@ export namespace SampleUpdaterCommands {
     export const RESTART_TO_UPDATE: Command = {
         id: 'electron-sample:restart-to-update',
         label: 'Restart to Update',
-        category
-    };
-
-    // Mock
-    export const MOCK_UPDATE_AVAILABLE: Command = {
-        id: 'electron-sample:mock-update-available',
-        label: 'Mock - Available',
-        category
-    };
-
-    export const MOCK_UPDATE_NOT_AVAILABLE: Command = {
-        id: 'electron-sample:mock-update-not-available',
-        label: 'Mock - Not Available',
         category
     };
 
@@ -154,12 +142,6 @@ export class SampleUpdaterFrontendContribution implements CommandContribution, M
             execute: () => this.updater.onRestartToUpdateRequested(),
             isEnabled: () => this.readyToUpdate,
             isVisible: () => this.readyToUpdate
-        });
-        registry.registerCommand(SampleUpdaterCommands.MOCK_UPDATE_AVAILABLE, {
-            execute: () => this.updater.setUpdateAvailable(true)
-        });
-        registry.registerCommand(SampleUpdaterCommands.MOCK_UPDATE_NOT_AVAILABLE, {
-            execute: () => this.updater.setUpdateAvailable(false)
         });
     }
 

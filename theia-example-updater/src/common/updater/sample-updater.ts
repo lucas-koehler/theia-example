@@ -27,8 +27,6 @@ export interface SampleUpdater extends JsonRpcServer<SampleUpdaterClient> {
     checkForUpdates(): Promise<{ status: UpdateStatus }>;
     onRestartToUpdateRequested(): void;
     disconnectClient(client: SampleUpdaterClient): void;
-
-    setUpdateAvailable(available: boolean): Promise<void>; // Mock
 }
 
 export const SampleUpdaterClient = Symbol('SampleUpdaterClient');

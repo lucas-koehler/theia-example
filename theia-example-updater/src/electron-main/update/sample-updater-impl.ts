@@ -14,45 +14,51 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { injectable } from 'inversify';
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { SampleUpdater, SampleUpdaterClient, UpdateStatus } from '../../common/updater/sample-updater';
+
+import { injectable } from 'inversify';
+
+const {autoUpdater} = require("electron-updater");
+
+
+var inProgress = false;
+var available = false;
+
+autoUpdater.on('checking-for-update', () => {
+    console.info("Checking for updates");
+    inProgress = true;
+    available = false;
+})
+autoUpdater.on('update-available', () => {
+    console.info("Update available");
+    inProgress = false;
+    available = true;
+})
+autoUpdater.on('update-not-available', () => {
+    console.info("Update not available");
+    inProgress = false;
+    available = false;
+})
 
 @injectable()
 export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplicationContribution {
 
     protected clients: Array<SampleUpdaterClient> = [];
-    protected inProgressTimer: NodeJS.Timer | undefined;
-    protected available = false;
 
     async checkForUpdates(): Promise<{ status: UpdateStatus }> {
-        if (this.inProgressTimer) {
+        console.info("Check for updates called");
+        autoUpdater.checkForUpdates();
+
+        if (inProgress) {
             return { status: UpdateStatus.InProgress };
         }
-        return { status: this.available ? UpdateStatus.Available : UpdateStatus.NotAvailable };
+        return { status: available ? UpdateStatus.Available : UpdateStatus.NotAvailable };
     }
 
     onRestartToUpdateRequested(): void {
         console.info("'Update to Restart' was requested by the frontend.");
-        // Here comes your install and restart implementation. For example: `autoUpdater.quitAndInstall();`
-    }
-
-    async setUpdateAvailable(available: boolean): Promise<void> {
-        if (this.inProgressTimer) {
-            clearTimeout(this.inProgressTimer);
-        }
-        if (!available) {
-            this.inProgressTimer = undefined;
-            this.available = false;
-        } else {
-            this.inProgressTimer = setTimeout(() => {
-                this.inProgressTimer = undefined;
-                this.available = true;
-                for (const client of this.clients) {
-                    client.notifyReadyToInstall();
-                }
-            }, 5000);
-        }
+        autoUpdater.quitAndInstall();  
     }
 
     onStart(application: ElectronMainApplication): void {
