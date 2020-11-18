@@ -15,54 +15,50 @@
  ********************************************************************************/
 
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
-import { SampleUpdater, SampleUpdaterClient, UpdateStatus } from '../../common/updater/sample-updater';
+import { SampleUpdater, SampleUpdaterClient } from '../../common/updater/sample-updater';
 
 import { injectable } from 'inversify';
 
 const {autoUpdater} = require("electron-updater");
 
+autoUpdater.logger = require("electron-log")
+autoUpdater.logger.transports.file.level = "info"
 
-var inProgress = false;
-var available = false;
 
-autoUpdater.on('checking-for-update', () => {
-    console.info("Checking for updates");
-    inProgress = true;
-    available = false;
-})
-autoUpdater.on('update-available', () => {
-    console.info("Update available");
-    inProgress = false;
-    available = true;
-})
-autoUpdater.on('update-not-available', () => {
-    console.info("Update not available");
-    inProgress = false;
-    available = false;
-})
+
+
 
 @injectable()
 export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplicationContribution {
 
     protected clients: Array<SampleUpdaterClient> = [];
 
-    async checkForUpdates(): Promise<{ status: UpdateStatus }> {
-        console.info("Check for updates called");
-        autoUpdater.checkForUpdates();
 
-        if (inProgress) {
-            return { status: UpdateStatus.InProgress };
-        }
-        return { status: available ? UpdateStatus.Available : UpdateStatus.NotAvailable };
+    constructor() {
+        autoUpdater.autoDownload = false
+        autoUpdater.on('update-available', () => {
+            this.clients.forEach(c => c.updateAvailable(true))
+        })
+        autoUpdater.on('update-not-available', () => {
+            this.clients.forEach(c => c.updateAvailable(false))
+        })
+    }
+
+    checkForUpdates(): void {
+        autoUpdater.checkForUpdates();
     }
 
     onRestartToUpdateRequested(): void {
-        console.info("'Update to Restart' was requested by the frontend.");
         autoUpdater.quitAndInstall();  
+    }
+
+    downloadUpdate(): void {
+        autoUpdater.downloadUpdate();
     }
 
     onStart(application: ElectronMainApplication): void {
         // Called when the contribution is starting. You can use both async and sync code from here.
+        this.checkForUpdates();
     }
 
     onStop(application: ElectronMainApplication): void {
@@ -72,26 +68,18 @@ export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplication
     setClient(client: SampleUpdaterClient | undefined): void {
         if (client) {
             this.clients.push(client);
-            console.info('Registered a new sample updater client.');
-        } else {
-            console.warn("Couldn't register undefined client.");
-        }
+        } 
     }
 
     disconnectClient(client: SampleUpdaterClient): void {
         const index = this.clients.indexOf(client);
         if (index !== -1) {
             this.clients.splice(index, 1);
-            console.info('Disposed a sample updater client.');
-        } else {
-            console.warn("Couldn't dispose client; it was not registered.");
-        }
+        } 
     }
 
     dispose(): void {
-        console.info('>>> Disposing sample updater service...');
         this.clients.forEach(this.disconnectClient.bind(this));
-        console.info('>>> Disposed sample updater service.');
     }
 
 }

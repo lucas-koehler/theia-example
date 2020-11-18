@@ -15,21 +15,17 @@
  ********************************************************************************/
 import { JsonRpcServer } from '@theia/core/lib/common/messaging/proxy-factory';
 
-export enum UpdateStatus {
-    InProgress = 'in-progress',
-    Available = 'available',
-    NotAvailable = 'not-available'
-}
-
 export const SampleUpdaterPath = '/services/sample-updater';
 export const SampleUpdater = Symbol('SampleUpdater');
 export interface SampleUpdater extends JsonRpcServer<SampleUpdaterClient> {
-    checkForUpdates(): Promise<{ status: UpdateStatus }>;
+    checkForUpdates(): void;
+    downloadUpdate(): void;
     onRestartToUpdateRequested(): void;
     disconnectClient(client: SampleUpdaterClient): void;
 }
 
 export const SampleUpdaterClient = Symbol('SampleUpdaterClient');
 export interface SampleUpdaterClient {
+    updateAvailable(available: boolean): void;
     notifyReadyToInstall(): void;
 }

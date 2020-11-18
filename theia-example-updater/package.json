@@ -6,7 +6,8 @@
   "dependencies": {
     "@theia/core": "^1.6.0",
     "@theia/output": "^1.6.0",
-    "electron-updater": "^4.3.5"
+    "electron-updater": "^4.3.5",
+    "electron-log": "^4.3.0"
   },
   "devDependencies": {
     "rimraf": "latest",

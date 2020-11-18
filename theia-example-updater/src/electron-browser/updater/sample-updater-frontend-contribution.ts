@@ -25,12 +25,11 @@ import {
     MenuPath,
     MessageService
 } from '@theia/core/lib/common';
-import { SampleUpdater, SampleUpdaterClient, UpdateStatus } from '../../common/updater/sample-updater';
+import { SampleUpdater, SampleUpdaterClient } from '../../common/updater/sample-updater';
 import { inject, injectable, postConstruct } from 'inversify';
 
 import { CommonMenus } from '@theia/core/lib/browser';
 import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
-import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { isOSX } from '@theia/core/lib/common/os';
 
 export namespace SampleUpdaterCommands {
@@ -61,8 +60,16 @@ export class SampleUpdaterClientImpl implements SampleUpdaterClient {
     protected readonly onReadyToInstallEmitter = new Emitter<void>();
     readonly onReadyToInstall = this.onReadyToInstallEmitter.event;
 
+
+    protected readonly onUpdateAvailableEmitter = new Emitter<boolean>();
+    readonly onUpdateAvailable = this.onUpdateAvailableEmitter.event;
+
     notifyReadyToInstall(): void {
         this.onReadyToInstallEmitter.fire();
+    }
+
+    updateAvailable(available: boolean): void {
+        this.onUpdateAvailableEmitter.fire(available);
     }
 
 }
@@ -107,6 +114,12 @@ export class SampleUpdaterFrontendContribution implements CommandContribution, M
 
     @postConstruct()
     protected init(): void {
+        this.updaterClient.onUpdateAvailable(available => {
+            if (available) {
+                this.handleDownloadUpdate();
+            }
+        })
+
         this.updaterClient.onReadyToInstall(async () => {
             this.readyToUpdate = true;
             this.menuUpdater.update();
@@ -117,23 +130,24 @@ export class SampleUpdaterFrontendContribution implements CommandContribution, M
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(SampleUpdaterCommands.CHECK_FOR_UPDATES, {
             execute: async () => {
-                const { status } = await this.updater.checkForUpdates();
-                switch (status) {
-                    case UpdateStatus.Available: {
-                        this.handleUpdatesAvailable();
-                        break;
-                    }
-                    case UpdateStatus.NotAvailable: {
-                        const { applicationName } = FrontendApplicationConfigProvider.get();
-                        this.messageService.info(`[Not Available]: You’re all good. You’ve got the latest version of ${applicationName}.`, { timeout: 3000 });
-                        break;
-                    }
-                    case UpdateStatus.InProgress: {
-                        this.messageService.warn('[Downloading]: Work in progress...', { timeout: 3000 });
-                        break;
-                    }
-                    default: throw new Error(`Unexpected status: ${status}`);
-                }
+                // const { status } = await 
+                this.updater.checkForUpdates();
+                // switch (status) {
+                //     case UpdateStatus.Available: {
+                //         this.handleUpdatesAvailable();
+                //         break;
+                //     }
+                //     case UpdateStatus.NotAvailable: {
+                //         const { applicationName } = FrontendApplicationConfigProvider.get();
+                //         this.messageService.info(`[Not Available]: You’re all good. You’ve got the latest version of ${applicationName}.`, { timeout: 3000 });
+                //         break;
+                //     }
+                //     case UpdateStatus.InProgress: {
+                //         this.messageService.warn('[Downloading]: Work in progress...', { timeout: 3000 });
+                //         break;
+                //     }
+                //     default: throw new Error(`Unexpected status: ${status}`);
+                // }
             },
             isEnabled: () => !this.readyToUpdate,
             isVisible: () => !this.readyToUpdate
@@ -152,6 +166,13 @@ export class SampleUpdaterFrontendContribution implements CommandContribution, M
         registry.registerMenuAction(SampleUpdaterMenu.MENU_PATH, {
             commandId: SampleUpdaterCommands.RESTART_TO_UPDATE.id
         });
+    }
+
+    protected async handleDownloadUpdate(): Promise<void> {
+        const answer = await this.messageService.info('[Available]: Found updates, do you want to download the update?', 'No', 'Yes');
+        if (answer === 'Yes') {
+            this.updater.downloadUpdate();
+        }
     }
 
     protected async handleUpdatesAvailable(): Promise<void> {
