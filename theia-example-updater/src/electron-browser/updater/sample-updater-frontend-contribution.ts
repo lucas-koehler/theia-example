@@ -117,6 +117,8 @@ export class SampleUpdaterFrontendContribution implements CommandContribution, M
         this.updaterClient.onUpdateAvailable(available => {
             if (available) {
                 this.handleDownloadUpdate();
+            } else {
+                this.handleNoUpdate();
             }
         })
 
@@ -130,24 +132,7 @@ export class SampleUpdaterFrontendContribution implements CommandContribution, M
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(SampleUpdaterCommands.CHECK_FOR_UPDATES, {
             execute: async () => {
-                // const { status } = await 
                 this.updater.checkForUpdates();
-                // switch (status) {
-                //     case UpdateStatus.Available: {
-                //         this.handleUpdatesAvailable();
-                //         break;
-                //     }
-                //     case UpdateStatus.NotAvailable: {
-                //         const { applicationName } = FrontendApplicationConfigProvider.get();
-                //         this.messageService.info(`[Not Available]: You’re all good. You’ve got the latest version of ${applicationName}.`, { timeout: 3000 });
-                //         break;
-                //     }
-                //     case UpdateStatus.InProgress: {
-                //         this.messageService.warn('[Downloading]: Work in progress...', { timeout: 3000 });
-                //         break;
-                //     }
-                //     default: throw new Error(`Unexpected status: ${status}`);
-                // }
             },
             isEnabled: () => !this.readyToUpdate,
             isVisible: () => !this.readyToUpdate
@@ -173,6 +158,10 @@ export class SampleUpdaterFrontendContribution implements CommandContribution, M
         if (answer === 'Yes') {
             this.updater.downloadUpdate();
         }
+    }
+
+    protected async handleNoUpdate(): Promise<void> {
+        this.messageService.info('Already using the latest version');
     }
 
     protected async handleUpdatesAvailable(): Promise<void> {

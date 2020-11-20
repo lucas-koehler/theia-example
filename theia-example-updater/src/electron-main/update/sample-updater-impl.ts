@@ -19,7 +19,7 @@ import { SampleUpdater, SampleUpdaterClient } from '../../common/updater/sample-
 
 import { injectable } from 'inversify';
 
-const {autoUpdater} = require("electron-updater");
+const { autoUpdater } = require("electron-updater");
 
 autoUpdater.logger = require("electron-log")
 autoUpdater.logger.transports.file.level = "info"
@@ -33,14 +33,28 @@ export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplication
 
     protected clients: Array<SampleUpdaterClient> = [];
 
+    private initialCheck: boolean = true;
+
 
     constructor() {
         autoUpdater.autoDownload = false
         autoUpdater.on('update-available', () => {
+            if (this.initialCheck) {
+                this.initialCheck = false;
+            }
             this.clients.forEach(c => c.updateAvailable(true))
         })
         autoUpdater.on('update-not-available', () => {
+            if (this.initialCheck) {
+                this.initialCheck = false;
+                /* do not report that no update is available on start up */
+                return;
+            }
             this.clients.forEach(c => c.updateAvailable(false))
+        })
+
+        autoUpdater.on('update-downloaded', () => {
+            this.clients.forEach(c => c.notifyReadyToInstall())
         })
     }
 
@@ -49,7 +63,7 @@ export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplication
     }
 
     onRestartToUpdateRequested(): void {
-        autoUpdater.quitAndInstall();  
+        autoUpdater.quitAndInstall();
     }
 
     downloadUpdate(): void {
@@ -68,14 +82,14 @@ export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplication
     setClient(client: SampleUpdaterClient | undefined): void {
         if (client) {
             this.clients.push(client);
-        } 
+        }
     }
 
     disconnectClient(client: SampleUpdaterClient): void {
         const index = this.clients.indexOf(client);
         if (index !== -1) {
             this.clients.splice(index, 1);
-        } 
+        }
     }
 
     dispose(): void {
