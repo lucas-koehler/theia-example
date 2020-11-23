@@ -34,6 +34,7 @@ export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplication
     protected clients: Array<SampleUpdaterClient> = [];
 
     private initialCheck: boolean = true;
+    private reportOnFirstRegistration: boolean = false;
 
 
     constructor() {
@@ -41,6 +42,9 @@ export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplication
         autoUpdater.on('update-available', () => {
             if (this.initialCheck) {
                 this.initialCheck = false;
+                if (this.clients.length === 0) {
+                    this.reportOnFirstRegistration = true;
+                }
             }
             this.clients.forEach(c => c.updateAvailable(true))
         })
@@ -82,6 +86,10 @@ export class SampleUpdaterImpl implements SampleUpdater, ElectronMainApplication
     setClient(client: SampleUpdaterClient | undefined): void {
         if (client) {
             this.clients.push(client);
+            if (this.reportOnFirstRegistration) {
+                this.reportOnFirstRegistration = false;
+                this.clients.forEach(c => c.updateAvailable(true))
+            }
         }
     }
 
