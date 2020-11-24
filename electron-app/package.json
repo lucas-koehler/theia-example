@@ -100,6 +100,17 @@
     "vscjava.vscode-java-test": "https://open-vsx.org/api/vscjava/vscode-java-test/0.24.2/file/vscjava.vscode-java-test-0.24.2.vsix",
     "vscjava.vscode-maven": "https://open-vsx.org/api/vscjava/vscode-maven/0.21.2/file/vscjava.vscode-maven-0.21.2.vsix",
     "vscjava.vscode-java-dependency": "https://open-vsx.org/api/vscjava/vscode-java-dependency/0.13.0/file/vscjava.vscode-java-dependency-0.13.0.vsix",
-    "alphabotsec.vscode-eclipse-keybindings": "https://open-vsx.org/api/alphabotsec/vscode-eclipse-keybindings/0.12.0/file/alphabotsec.vscode-eclipse-keybindings-0.12.0.vsix"
+    "alphabotsec.vscode-eclipse-keybindings": "https://open-vsx.org/api/alphabotsec/vscode-eclipse-keybindings/0.12.0/file/alphabotsec.vscode-eclipse-keybindings-0.12.0.vsix",
+    "vscode.css": "https://open-vsx.org/api/vscode/css/1.51.1/file/vscode.css-1.51.1.vsix",
+    "vscode.html": "https://open-vsx.org/api/vscode/html/1.51.1/file/vscode.html-1.51.1.vsix",
+    "vscode.javascript": "https://open-vsx.org/api/vscode/javascript/1.51.1/file/vscode.javascript-1.51.1.vsix",
+    "vscode.json": "https://open-vsx.org/api/vscode/json/1.51.1/file/vscode.json-1.51.1.vsix",
+    "vscode.json-language-features": "https://open-vsx.org/api/vscode/json-language-features/1.51.1/file/vscode.json-language-features-1.51.1.vsix",
+    "vscode.log": "https://open-vsx.org/api/vscode/log/1.51.1/file/vscode.log-1.51.1.vsix",
+    "vscode.markdown": "https://open-vsx.org/api/vscode/markdown/1.51.1/file/vscode.markdown-1.51.1.vsix",
+    "vscode.typescript": "https://open-vsx.org/api/vscode/typescript/1.51.1/file/vscode.typescript-1.51.1.vsix",
+    "vscode.typescript-language-features": "https://open-vsx.org/api/vscode/typescript-language-features/1.51.1/file/vscode.typescript-language-features-1.51.1.vsix",
+    "vscode.yaml": "https://open-vsx.org/api/vscode/yaml/1.51.1/file/vscode.yaml-1.51.1.vsix",
+    "vscode.xml": "https://open-vsx.org/api/vscode/xml/1.51.1/file/vscode.xml-1.51.1.vsix"
   }
 }
