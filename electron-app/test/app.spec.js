@@ -20,6 +20,12 @@ function getBinaryPath() {
         "win-unpacked",
         "Theia.exe"
       );
+    case "darwin":
+      return path.join(
+        distFolder,
+        "mac",
+        "theia-example"
+      );
     default:
       return undefined;
   }
