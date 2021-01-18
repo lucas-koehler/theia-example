@@ -24,7 +24,10 @@ function getBinaryPath() {
       return path.join(
         distFolder,
         "mac",
-        "theia-example"
+        "Theia.app",
+        "Contents",
+        "MacOS",
+        "Theia"
       );
     default:
       return undefined;
